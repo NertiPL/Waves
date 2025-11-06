@@ -14,11 +14,41 @@ namespace StarterAssets
 	{
 		[Header("Player")]
 
-        [Header("Interaction")]
+        /*[Header("Interaction")]
         [SerializeField] private float interactionRange = 4f;
-        //private Interactable focusedInteractable;
+        private Interactable focusedInteractable;*/
 
-        [Space(10)]
+        [Header("Look Settings")]
+        [Tooltip("Mouse sensitivity multiplier for raw Pointer/Delta input")]
+        public float MouseSensitivity = 1.0f;
+        [Tooltip("Gamepad sensitivity in degrees per second")]
+        public float GamepadSensitivity = 120.0f;
+        [Tooltip("Invert horizontal mouse axis")]
+        public bool InvertMouseX = false;
+        [Tooltip("Invert vertical mouse axis")]
+        public bool InvertMouseY = false;
+        [Tooltip("Invert horizontal gamepad axis")]
+        public bool InvertPadX = false;
+        [Tooltip("Invert vertical gamepad axis")]
+        public bool InvertPadY = false;
+
+        [Header("Crouch Settings")]
+        [Tooltip("Standing capsule height of the CharacterController")]
+        [SerializeField] private float _standingHeight = 1.8f;
+        [Tooltip("Crouched capsule height of the CharacterController")]
+        [SerializeField] private float _crouchHeight = 1.2f;
+        [Tooltip("Camera target local Y when standing (eye height)")]
+        [SerializeField] private float _cameraStandY = 1.6f;
+        [Tooltip("Camera target local Y when crouched")]
+        [SerializeField] private float _cameraCrouchY = 1.0f;
+        [Tooltip("How fast camera and capsule blend between stand and crouch")]
+        [SerializeField] private float _crouchLerpSpeed = 10f;
+        [Tooltip("Move speed of the character in m/s")]
+        [SerializeField] private float CrouchSpeed = 2f;
+        [Tooltip("Layers checked above head to prevent standing up into geometry")]
+        [SerializeField] private LayerMask _headBlockLayers = ~0;
+
+        [Header("Movement Settings")]
         [Tooltip("Move speed of the character in m/s")]
 		public float MoveSpeed = 4.0f;
 		[Tooltip("Sprint speed of the character in m/s")]
@@ -67,8 +97,11 @@ namespace StarterAssets
 		private float _verticalVelocity;
 		private float _terminalVelocity = 53.0f;
 
-		// timeout deltatime
-		private float _jumpTimeoutDelta;
+        private bool _isCrouched;
+        private bool _prevCrouchEdge;
+
+        // timeout deltatime
+        private float _jumpTimeoutDelta;
 		private float _fallTimeoutDelta;
 
 	
@@ -111,9 +144,22 @@ namespace StarterAssets
 #else
 			Debug.LogError( "Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
 #endif
+            // Trust serialized heights unless you want to read current controller
+            _controller.height = _standingHeight;
+            var c = _controller.center;
+            c.y = _controller.height * 0.5f;
+            _controller.center = c;
 
-			// reset our timeouts on start
-			_jumpTimeoutDelta = JumpTimeout;
+            // snap camera to stand height on start
+            if (CinemachineCameraTarget != null)
+            {
+                var lp = CinemachineCameraTarget.transform.localPosition;
+                lp.y = _cameraStandY;
+                CinemachineCameraTarget.transform.localPosition = lp;
+            }
+
+            // reset our timeouts on start
+            _jumpTimeoutDelta = JumpTimeout;
 			_fallTimeoutDelta = FallTimeout;
 		}
 
@@ -122,7 +168,10 @@ namespace StarterAssets
 			JumpAndGravity();
 			GroundedCheck();
 			Move();
-            HandleInteract();
+
+            HandleCrouchToggle();
+            ApplyCrouchBlend();
+            //HandleInteract();
         }
 
 		private void LateUpdate()
@@ -135,11 +184,11 @@ namespace StarterAssets
 			RotationSpeed = amount;
 		}
 
-        private void HandleInteract()
+       /* private void HandleInteract()
         {
-            /*if (_mainCamera == null) return;
+            if (_mainCamera == null) return;
 
-             Ray ray = new Ray(_mainCamera.transform.position, _mainCamera.transform.forward);
+            Ray ray = new Ray(_mainCamera.transform.position, _mainCamera.transform.forward);
             if (Physics.Raycast(ray, out RaycastHit hit, interactionRange, ~0, QueryTriggerInteraction.Collide))
             {
                 var interactable = hit.collider.GetComponentInParent<Interactable>();
@@ -161,8 +210,8 @@ namespace StarterAssets
                 }
             }
 
-            focusedInteractable = null;*/
-        }
+            focusedInteractable = null;
+        }*/
 
         private void GroundedCheck()
 		{
@@ -171,38 +220,56 @@ namespace StarterAssets
 			Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
 		}
 
-		private void CameraRotation()
+        private void CameraRotation()
+        {
+            if (_input.look.sqrMagnitude < _threshold) return;
+
+            bool isMouse = IsCurrentDeviceMouse;
+
+            // invert
+            float invX = 1f, invY = 1f;
+            if (isMouse)
+            {
+                if (InvertMouseX) invX = -1f;
+                if (InvertMouseY) invY = -1f;
+            }
+            else
+            {
+                if (InvertPadX) invX = -1f;
+                if (InvertPadY) invY = -1f;
+            }
+
+            // mice are raw delta, do not multiply by dt
+            float dt = isMouse ? 1f : Time.deltaTime;
+            float sens = isMouse ? MouseSensitivity : GamepadSensitivity;
+
+            _cinemachineTargetPitch += (_input.look.y * invY) * sens * dt;
+            _rotationVelocity = (_input.look.x * invX) * sens * dt;
+
+            _cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);
+
+            CinemachineCameraTarget.transform.localRotation = Quaternion.Euler(_cinemachineTargetPitch, 0f, 0f);
+            transform.Rotate(Vector3.up * _rotationVelocity);
+        }
+
+        private void Move()
 		{
-			// if there is an input
-			if (_input.look.sqrMagnitude >= _threshold)
-			{
-				//Don't multiply mouse input by Time.deltaTime
-				float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
-				
-				_cinemachineTargetPitch += _input.look.y * RotationSpeed * deltaTimeMultiplier;
-				_rotationVelocity = _input.look.x * RotationSpeed * deltaTimeMultiplier;
+            // block sprint when crouched
+            if (_isCrouched && _input.sprint)
+                _input.sprint = false;
 
-				// clamp our pitch rotation
-				_cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);
+            // set target speed based on move speed, sprint speed and if sprint is pressed
+            float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
 
-				// Update Cinemachine camera target pitch
-				CinemachineCameraTarget.transform.localRotation = Quaternion.Euler(_cinemachineTargetPitch, 0.0f, 0.0f);
+            // crouch always reduces to crouch multiplier and disables sprint speed
+            if (_isCrouched)
+                targetSpeed = CrouchSpeed;
 
-				// rotate the player left and right
-				transform.Rotate(Vector3.up * _rotationVelocity);
-			}
-		}
+            // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
 
-		private void Move()
-		{
-			// set target speed based on move speed, sprint speed and if sprint is pressed
-			float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
-
-			// a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
-
-			// note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-			// if there is no input, set the target speed to 0
-			if (_input.move == Vector2.zero) targetSpeed = 0.0f;
+            // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
+            // if there is no input, set the target speed to 0
+            if (_input.move == Vector2.zero) targetSpeed = 0.0f;
 
 			// a reference to the players current horizontal velocity
 			float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
@@ -295,7 +362,70 @@ namespace StarterAssets
 			return Mathf.Clamp(lfAngle, lfMin, lfMax);
 		}
 
-		private void OnDrawGizmosSelected()
+        private void HandleCrouchToggle()
+        {
+            bool edgeDown = _input.crouch && !_prevCrouchEdge;
+
+            if (edgeDown)
+            {
+                if (_isCrouched)
+                {
+                    // try to stand up; only if head space is clear
+                    if (CanStandUp())
+                        _isCrouched = false;
+                }
+                else
+                {
+                    // crouch always allowed
+                    _isCrouched = true;
+                    // cancel sprint while crouched
+                    if (_input.sprint) _input.sprint = false;
+                }
+            }
+
+            _prevCrouchEdge = _input.crouch;
+
+            // reset crouch after handling
+            _input.crouch = false;
+        }
+
+        private void ApplyCrouchBlend()
+        {
+            float targetHeight = _isCrouched ? _crouchHeight : _standingHeight;
+            float targetCamY = _isCrouched ? _cameraCrouchY : _cameraStandY;
+
+            // capsule height and center
+            _controller.height = Mathf.Lerp(_controller.height, targetHeight, Time.deltaTime * _crouchLerpSpeed);
+            var c = _controller.center;
+            c.y = Mathf.Lerp(c.y, _controller.height * 0.5f, Time.deltaTime * _crouchLerpSpeed);
+            _controller.center = c;
+
+            // camera target Y (local)
+            if (CinemachineCameraTarget != null)
+            {
+                var lp = CinemachineCameraTarget.transform.localPosition;
+                lp.y = Mathf.Lerp(lp.y, targetCamY, Time.deltaTime * _crouchLerpSpeed);
+                CinemachineCameraTarget.transform.localPosition = lp;
+            }
+        }
+
+        private bool CanStandUp()
+        {
+            // define a test capsule slightly taller than standing to be safe
+            float radius = _controller.radius * 0.95f;
+            Vector3 basePos = transform.position + _controller.center - Vector3.up * (_controller.height * 0.5f);
+            Vector3 standTop = basePos + Vector3.up * _standingHeight;
+
+            // small inset to avoid grazing the floor
+            Vector3 p1 = basePos + Vector3.up * (radius + 0.02f);
+            Vector3 p2 = standTop - Vector3.up * (radius + 0.02f);
+
+            // if anything blocks, cannot stand
+            bool blocked = Physics.CheckCapsule(p1, p2, radius, _headBlockLayers, QueryTriggerInteraction.Ignore);
+            return !blocked;
+        }
+
+        private void OnDrawGizmosSelected()
 		{
 			Color transparentGreen = new Color(0.0f, 1.0f, 0.0f, 0.35f);
 			Color transparentRed = new Color(1.0f, 0.0f, 0.0f, 0.35f);
