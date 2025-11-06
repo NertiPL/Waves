@@ -30,7 +30,7 @@ public class TempPlayerControler : MonoBehaviour
 
     void HandlePlayerEvent(PlayerEvent playerEvent)
     {
-        Debug.Log($"Player Event recieved! Health: {playerEvent.health}, Mana: {playerEvent.mana}");
+        Debug.Log($"Player Event recieved! Health: {playerEvent.health}");
     }
 
     private void Update()
@@ -73,7 +73,6 @@ public class TempPlayerControler : MonoBehaviour
         EventBus<PlayerEvent>.Raise(new PlayerEvent
         {
             health = health,
-            mana = mana
         });
         Debug.Log("Interacted");
     }
