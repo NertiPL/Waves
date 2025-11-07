@@ -13,6 +13,11 @@ public class InCameraView : MonoBehaviour
         bounds = GetComponent<Collider>().bounds;
     }
 
+    private void Start()
+    {
+        camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponentInChildren<Camera>();
+    }
+
     private void FixedUpdate()
     {
         Matrix4x4 customProj = Matrix4x4.Perspective(
