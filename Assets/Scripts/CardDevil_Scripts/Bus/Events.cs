@@ -8,8 +8,10 @@ public struct PlayerEvent : IEvent
     public int health;
 }
 
-public struct ShowInteractEvent :IEvent 
+public struct InteractEvent :IEvent 
 { 
     public bool showInteract;
-    public Object interactableObject;
+    public GameObject interactableObject;
+    public TypesOfInteractables type;
 }
+

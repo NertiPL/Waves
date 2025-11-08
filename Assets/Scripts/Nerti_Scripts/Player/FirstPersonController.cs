@@ -114,7 +114,9 @@ namespace StarterAssets
 
 		private const float _threshold = 0.01f;
 
-		private bool IsCurrentDeviceMouse
+        EventBinding<InteractEvent> interactEventBinding;
+
+        private bool IsCurrentDeviceMouse
 		{
 			get
 			{
@@ -163,7 +165,19 @@ namespace StarterAssets
 			_fallTimeoutDelta = FallTimeout;
 		}
 
-		private void Update()
+        private void OnEnable()
+        {
+
+            interactEventBinding = new EventBinding<InteractEvent>(HandleInteract);
+            EventBus<InteractEvent>.Register(interactEventBinding);
+        }
+
+        private void OnDisable()
+        {
+            EventBus<InteractEvent>.Deregister(interactEventBinding);
+        }
+
+        private void Update()
 		{
 			JumpAndGravity();
 			GroundedCheck();
@@ -183,6 +197,32 @@ namespace StarterAssets
 		{
 			RotationSpeed = amount;
 		}
+
+        void HandleInteract(InteractEvent e)
+        {
+            if (e.showInteract)
+            {
+                //check if player is using the interact button, all below is what to put inside the check
+                /*if (e.type == TypesOfInteractables.FlashBomb)
+                {
+                    Destroy(e.interactableObject);
+                    //event to change eq, add bomb to eq
+                }
+                else if (e.type == TypesOfInteractables.Door)
+                {
+                    //animate opening of door or some shi
+                }
+                else
+                {
+                    Destroy(e.interactableObject);
+                    //event to change eq, add jar to eq
+                }*/
+            }
+            else
+            {
+                //stop checking if the player is using the interact button (unless not needed)
+            }
+        }
 
        /* private void HandleInteract()
         {

@@ -1,8 +1,15 @@
 using UnityEngine;
 
+public enum TypesOfInteractables
+{
+    FlashBomb,
+    Door,
+    Jar
+}
 public class InCameraView : MonoBehaviour
 {
     [SerializeField] Camera camera;
+    [SerializeField] TypesOfInteractables typeOfInteractable;
     Plane[] cameraFrustum;
     Bounds bounds;
     float shrinkFactor = 0.33f;
@@ -31,11 +38,20 @@ public class InCameraView : MonoBehaviour
         Matrix4x4 customVP = customProj * viewMatrix;
         cameraFrustum = GeometryUtility.CalculateFrustumPlanes(customVP);
 
+        if(GeometryUtility.TestPlanesAABB(cameraFrustum, bounds))
+        {
+            transform.GetComponent<Outline>().enabled = true;
+        }
+        else
+        {
+            transform.GetComponent<Outline>().enabled = false;
+        }
         //info goes to UI and Player. UI shows popup and player waits for an interaciton to remove bomb object if it is it
-        EventBus<ShowInteractEvent>.Raise(new ShowInteractEvent
+        EventBus<InteractEvent>.Raise(new InteractEvent
         {
             showInteract = GeometryUtility.TestPlanesAABB(cameraFrustum, bounds),
-            interactableObject = this.gameObject
+            interactableObject = this.gameObject,
+            type = typeOfInteractable
         });
     }
 }

@@ -1,29 +1,46 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UIScript : MonoBehaviour
 {
-    [SerializeField] Image interactPopUp;
-    EventBinding<ShowInteractEvent> showInteractEventBinding;
+    [SerializeField] GameObject interactPopUp;
+    [SerializeField] TMP_Text textMeshPro;
+    EventBinding<InteractEvent> showInteractEventBinding;
     private void Awake()
     {
-        interactPopUp.enabled = false;
+        textMeshPro = interactPopUp.GetComponentInChildren<TMP_Text>();
+        interactPopUp.SetActive(false);
     }
 
     private void OnEnable()
     {
 
-        showInteractEventBinding = new EventBinding<ShowInteractEvent>(HandleShowInteractEvent);
-        EventBus<ShowInteractEvent>.Register(showInteractEventBinding);
+        showInteractEventBinding = new EventBinding<InteractEvent>(HandleShowInteractEvent);
+        EventBus<InteractEvent>.Register(showInteractEventBinding);
     }
 
     private void OnDisable()
     {
-        EventBus<ShowInteractEvent>.Deregister(showInteractEventBinding);
+        EventBus<InteractEvent>.Deregister(showInteractEventBinding);
     }
 
-    void HandleShowInteractEvent(ShowInteractEvent e)
+    void HandleShowInteractEvent(InteractEvent e)
     {
-        interactPopUp.enabled = e.showInteract;
+        interactPopUp.SetActive(e.showInteract);
+        textMeshPro.text = "Click \"E\" to interact with ";
+        if (e.type == TypesOfInteractables.Door)
+        {
+            textMeshPro.text += "The Door";
+        }
+        else if(e.type == TypesOfInteractables.Jar)
+        {
+            textMeshPro.text += "The Jar Of Sound";
+        }
+        else
+        {
+            textMeshPro.text += "The Flash Bomb";
+        }
+
     }
 }
