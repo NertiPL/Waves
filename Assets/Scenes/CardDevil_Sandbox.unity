@@ -1059,6 +1059,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   camera: {fileID: 0}
   typeOfInteractable: 0
+  distanceToInteract: 2
+  dis: 0
 --- !u!65 &2059039038
 BoxCollider:
   m_ObjectHideFlags: 0
