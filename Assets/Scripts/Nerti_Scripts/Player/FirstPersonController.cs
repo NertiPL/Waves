@@ -202,25 +202,24 @@ namespace StarterAssets
         {
             if (e.showInteract)
             {
-                //check if player is using the interact button, all below is what to put inside the check
-                /*if (e.type == TypesOfInteractables.FlashBomb)
+                if (_input.interact)
                 {
-                    Destroy(e.interactableObject);
-                    //event to change eq, add bomb to eq
+                    _input.interact = false;
+                    if (e.type == TypesOfInteractables.FlashBomb)
+                    {
+                        Destroy(e.interactableObject);
+                        //event to change eq, add bomb to eq
+                    }
+                    else if (e.type == TypesOfInteractables.Door)
+                    {
+                        //animate opening of door or some shi
+                    }
+                    else
+                    {
+                        Destroy(e.interactableObject);
+                        //event to change eq, add jar to eq
+                    }
                 }
-                else if (e.type == TypesOfInteractables.Door)
-                {
-                    //animate opening of door or some shi
-                }
-                else
-                {
-                    Destroy(e.interactableObject);
-                    //event to change eq, add jar to eq
-                }*/
-            }
-            else
-            {
-                //stop checking if the player is using the interact button (unless not needed)
             }
         }
 
