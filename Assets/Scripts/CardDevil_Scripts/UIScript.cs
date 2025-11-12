@@ -37,7 +37,7 @@ public class UIScript : MonoBehaviour
         {
             textMeshPro.text += "The Jar Of Sound";
         }
-        else
+        else if(e.type == TypesOfInteractables.FlashBomb)
         {
             textMeshPro.text += "The Flash Bomb";
         }

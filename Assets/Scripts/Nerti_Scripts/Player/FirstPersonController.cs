@@ -1,8 +1,17 @@
 ﻿using Game.Player;
+using Unity.VisualScripting;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
+
+public enum TypesOfInteractables
+{
+    None,
+    FlashBomb,
+    Door,
+    Jar
+}
 
 namespace StarterAssets
 {
@@ -14,9 +23,11 @@ namespace StarterAssets
 	{
 		[Header("Player")]
 
-        /*[Header("Interaction")]
+        [Header("Interaction")]
         [SerializeField] private float interactionRange = 4f;
-        private Interactable focusedInteractable;*/
+        //private Interactable focusedInteractable;
+        TypesOfInteractables rayHitThisBefore = TypesOfInteractables.None;
+
 
         [Header("Look Settings")]
         [Tooltip("Mouse sensitivity multiplier for raw Pointer/Delta input")]
@@ -128,7 +139,7 @@ namespace StarterAssets
 			}
 		}
 
-		private void Awake()
+        private void Awake()
 		{
 			// get a reference to our main camera
 			if (_mainCamera == null)
@@ -168,7 +179,7 @@ namespace StarterAssets
         private void OnEnable()
         {
 
-            interactEventBinding = new EventBinding<InteractEvent>(HandleInteract);
+            interactEventBinding = new EventBinding<InteractEvent>(HandleInteractEvent);
             EventBus<InteractEvent>.Register(interactEventBinding);
         }
 
@@ -185,7 +196,7 @@ namespace StarterAssets
 
             HandleCrouchToggle();
             ApplyCrouchBlend();
-            //HandleInteract();
+            HandleInteract();
         }
 
 		private void LateUpdate()
@@ -198,13 +209,54 @@ namespace StarterAssets
 			RotationSpeed = amount;
 		}
 
-        void HandleInteract(InteractEvent e)
+        void HandleInteract()
+        {
+            bool show = false;
+            TypesOfInteractables type = TypesOfInteractables.None;
+            GameObject GO = null;
+
+            Ray ray = new Ray(_mainCamera.transform.position, _mainCamera.transform.forward);
+            if (Physics.Raycast(ray, out RaycastHit hit, interactionRange)){
+                if (hit.collider.tag == "FlashBomb")
+                {
+                    hit.collider.gameObject.GetComponent<Outline>().enabled = true;
+                    type = TypesOfInteractables.FlashBomb;
+                    show = true;
+                    rayHitThisBefore = type;
+                }
+                else if (hit.collider.tag == "Door")
+                {
+                    hit.collider.gameObject.GetComponent<Outline>().enabled = true;
+                    type = TypesOfInteractables.Door;
+                    show = true;
+                    rayHitThisBefore = type;
+                }
+                else if (hit.collider.tag == "Jar")
+                {
+                    hit.collider.gameObject.GetComponent<Outline>().enabled = true;
+                    type = TypesOfInteractables.Jar;
+                    show = true;
+                    rayHitThisBefore = type;
+                }
+                GO=hit.collider.gameObject;
+            }
+            EventBus<InteractEvent>.Raise(new InteractEvent
+            {
+                showInteract=show,
+                interactableObject=GO,
+                type=type
+            });
+        }
+
+        void HandleInteractEvent(InteractEvent e)
         {
             if (e.showInteract)
             {
+
                 if (_input.interact)
                 {
                     _input.interact = false;
+
                     if (e.type == TypesOfInteractables.FlashBomb)
                     {
                         Destroy(e.interactableObject);
@@ -219,7 +271,33 @@ namespace StarterAssets
                         Destroy(e.interactableObject);
                         //event to change eq, add jar to eq
                     }
+                    
                 }
+            }
+            else if(!e.showInteract && rayHitThisBefore!= TypesOfInteractables.None)
+            {
+                if(rayHitThisBefore== TypesOfInteractables.FlashBomb)
+                {
+                    foreach (var gameObj in GameObject.FindGameObjectsWithTag("FlashBomb"))
+                    {
+                        gameObj.GetComponent<Outline>().enabled = false;
+                    }
+                }
+                else if(rayHitThisBefore == TypesOfInteractables.Door)
+                {
+                    foreach (var gameObj in GameObject.FindGameObjectsWithTag("Door"))
+                    {
+                        gameObj.GetComponent<Outline>().enabled = false;
+                    }
+                }
+                else if(rayHitThisBefore == TypesOfInteractables.Jar)
+                {
+                    foreach (var gameObj in GameObject.FindGameObjectsWithTag("Jar"))
+                    {
+                        gameObj.GetComponent<Outline>().enabled = false;
+                    }
+                }
+                rayHitThisBefore = TypesOfInteractables.None;
             }
         }
 

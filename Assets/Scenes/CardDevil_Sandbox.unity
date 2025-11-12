@@ -211,6 +211,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2301397694956284663, guid: 2e465ec6483eb1145ba5225401f72f35, type: 3}
+      propertyPath: interactionRange
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 7149084054694139053, guid: 2e465ec6483eb1145ba5225401f72f35, type: 3}
       propertyPath: m_Name
       value: Player
@@ -644,6 +648,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cameras
       objectReference: {fileID: 0}
+    - target: {fileID: 7243764985890346147, guid: 747d7d83bfc6b9a46aa225ea2d9bbea2, type: 3}
+      propertyPath: m_TagString
+      value: MainCamera
+      objectReference: {fileID: 0}
     - target: {fileID: 8660702890899970906, guid: 747d7d83bfc6b9a46aa225ea2d9bbea2, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.3844099
@@ -1036,30 +1044,14 @@ GameObject:
   - component: {fileID: 2059039040}
   - component: {fileID: 2059039039}
   - component: {fileID: 2059039038}
-  - component: {fileID: 2059039037}
   - component: {fileID: 2059039042}
   m_Layer: 0
   m_Name: Bomb
-  m_TagString: Untagged
+  m_TagString: FlashBomb
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2059039037
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2059039036}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 450ca58ba3a6e344a8346c7fae8336a2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  camera: {fileID: 0}
-  typeOfInteractable: 0
-  distanceToInteract: 2
 --- !u!65 &2059039038
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1159,7 +1151,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2059039036}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
   m_Name: 
