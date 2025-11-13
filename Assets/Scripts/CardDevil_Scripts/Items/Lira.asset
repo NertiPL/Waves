@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Lira
   m_EditorClassIdentifier: Assembly-CSharp::Item
   name: Lira
-  sprite: {fileID: 0}
+  sprite: {fileID: 21300000, guid: 64c52678ca84ac249b14702af79426c1, type: 3}
   oneUse: 0

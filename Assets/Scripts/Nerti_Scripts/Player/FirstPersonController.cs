@@ -244,6 +244,7 @@ namespace StarterAssets
                 {
                     index=_input.selectedSlot
                 });
+                _input.attack = false;
             }
         }
 
