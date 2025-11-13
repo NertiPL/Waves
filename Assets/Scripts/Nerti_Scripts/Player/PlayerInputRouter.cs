@@ -16,6 +16,10 @@ namespace Game.Player
         public bool crouch;
         public bool interact;
 
+        [Header("Inventory / Slots")]
+        [Tooltip("Currently selected hotbar slot (0 = slot 1, 1 = slot 2, etc.)")]
+        public int selectedSlot = 0;
+
         [Header("Movement Settings")]
         public bool analogMovement;
 
@@ -65,6 +69,25 @@ namespace Game.Player
         public void OnInteract(InputValue value)
         {
             InteractInput(value.isPressed);
+        }
+
+        public void OnEquipSlot(InputValue value)
+        {
+            if (!value.isPressed)
+                return;
+
+            if (Keyboard.current == null)
+                return;
+
+            int slot = selectedSlot;
+
+            if (Keyboard.current.digit1Key.wasPressedThisFrame) slot = 0;
+            else if (Keyboard.current.digit2Key.wasPressedThisFrame) slot = 1;
+            else if (Keyboard.current.digit3Key.wasPressedThisFrame) slot = 2;
+            else if (Keyboard.current.digit4Key.wasPressedThisFrame) slot = 3;
+
+            selectedSlot = slot;
+            Debug.Log($"[Input] Equip slot: {selectedSlot + 1}");
         }
 #endif
 
