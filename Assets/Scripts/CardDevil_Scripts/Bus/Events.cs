@@ -15,3 +15,5 @@ public struct InteractEvent :IEvent
     public TypesOfInteractables type;
 }
 
+public struct MakeSoundEvent : IEvent { }
+
