@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b39902e8ee422a49b78631a3cb94196, type: 3}
   m_Name: Lute
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  name: 
+  name: Lute
   sprite: {fileID: 0}
+  oneUse: 0

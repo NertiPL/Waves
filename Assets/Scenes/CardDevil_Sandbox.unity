@@ -161,7 +161,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 200, y: 0}
+  m_SizeDelta: {x: 200, y: 201}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &128556790
 MonoBehaviour:
@@ -581,7 +581,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 200, y: 0}
+  m_SizeDelta: {x: 200, y: 201}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &525756039
 MonoBehaviour:
@@ -1810,7 +1810,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIScript
   interactPopUp: {fileID: 1667589323}
-  textMeshPro: {fileID: 0}
+  eqPanel: {fileID: 895643529}
+  eqImages: []
 --- !u!1 &1374304360
 GameObject:
   m_ObjectHideFlags: 0
@@ -2453,7 +2454,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 200, y: 0}
+  m_SizeDelta: {x: 200, y: 201}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1641304862
 MonoBehaviour:
@@ -2882,6 +2883,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e3c51161b75d8f4cae1d745c7a6fc47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  allItems:
+  - {fileID: 11400000, guid: 13e982af48baf754795854e1930abe2c, type: 2}
+  - {fileID: 11400000, guid: 9a9edd03debcd7749897aef5e52ca136, type: 2}
+  eq: []
 --- !u!4 &1861682849
 Transform:
   m_ObjectHideFlags: 0
@@ -3009,7 +3014,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 200, y: 0}
+  m_SizeDelta: {x: 200, y: 201}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1916651930
 MonoBehaviour:
