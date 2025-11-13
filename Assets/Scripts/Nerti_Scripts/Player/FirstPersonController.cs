@@ -260,7 +260,10 @@ namespace StarterAssets
                     if (e.type == TypesOfInteractables.FlashBomb)
                     {
                         Destroy(e.interactableObject);
-                        //event to change eq, add bomb to eq
+                        EventBus<AddItemToEq>.Raise(new AddItemToEq
+                        {
+                            name="Flash Bomb"
+                        });
                     }
                     else if (e.type == TypesOfInteractables.Door)
                     {
