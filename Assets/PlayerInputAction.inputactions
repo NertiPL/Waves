@@ -248,7 +248,7 @@
                 {
                     "name": "",
                     "id": "c8fcd86e-dcfd-4f88-8e93-b638cdbf3320",
-                    "path": "<Gamepad>/leftStick/down",
+                    "path": "<Gamepad>/leftStickPress",
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
@@ -292,7 +292,7 @@
                 {
                     "name": "",
                     "id": "50e6edcd-3ed1-494c-85d0-d602713bdd21",
-                    "path": "<Gamepad>/rightStick/down",
+                    "path": "<Gamepad>/rightStickPress",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -359,6 +359,28 @@
                     "name": "",
                     "id": "53ae19bd-24a3-4a05-93ea-cda1dd9ab344",
                     "path": "<Keyboard>/4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EquipSlot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cd39df68-4b37-4ab1-9294-0ddfea2f5b68",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EquipSlot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2d903e20-263d-46d1-8f05-63bd3e13a62d",
+                    "path": "<Gamepad>/leftShoulder",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
