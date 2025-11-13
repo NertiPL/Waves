@@ -20,6 +20,9 @@ namespace Game.Player
         [Tooltip("Currently selected hotbar slot (0 = slot 1, 1 = slot 2, etc.)")]
         public int selectedSlot = 0;
 
+        [Tooltip("How many slots are available in the hotbar.")]
+        public int maxSlots = 4;
+
         [Header("Movement Settings")]
         public bool analogMovement;
 
@@ -76,18 +79,39 @@ namespace Game.Player
             if (!value.isPressed)
                 return;
 
-            if (Keyboard.current == null)
-                return;
+            bool changed = false;
 
-            int slot = selectedSlot;
+            // Keyboard
+            if (Keyboard.current != null)
+            {
+                if (Keyboard.current.digit1Key.wasPressedThisFrame) { selectedSlot = 0; changed = true; }
+                else if (Keyboard.current.digit2Key.wasPressedThisFrame) { selectedSlot = 1; changed = true; }
+                else if (Keyboard.current.digit3Key.wasPressedThisFrame) { selectedSlot = 2; changed = true; }
+                else if (Keyboard.current.digit4Key.wasPressedThisFrame) { selectedSlot = 3; changed = true; }
+            }
 
-            if (Keyboard.current.digit1Key.wasPressedThisFrame) slot = 0;
-            else if (Keyboard.current.digit2Key.wasPressedThisFrame) slot = 1;
-            else if (Keyboard.current.digit3Key.wasPressedThisFrame) slot = 2;
-            else if (Keyboard.current.digit4Key.wasPressedThisFrame) slot = 3;
+            // Gamepad RB - next, LB - previous
+            if (Gamepad.current != null)
+            {
+                if (Gamepad.current.rightShoulder.wasPressedThisFrame)
+                {
+                    selectedSlot = (selectedSlot + 1) % maxSlots;
+                    changed = true;
+                }
+                else if (Gamepad.current.leftShoulder.wasPressedThisFrame)
+                {
+                    selectedSlot = (selectedSlot - 1 + maxSlots) % maxSlots;
+                    changed = true;
+                }
+            }
 
-            selectedSlot = slot;
-            Debug.Log($"[Input] Equip slot: {selectedSlot + 1}");
+            if (changed)
+            {
+                selectedSlot = Mathf.Clamp(selectedSlot, 0, maxSlots - 1);
+
+                Debug.Log($"[Input] Equip slot: {selectedSlot + 1}");
+                // add for example InventoryManager.Equip(selectedSlot);
+            }
         }
 #endif
 
