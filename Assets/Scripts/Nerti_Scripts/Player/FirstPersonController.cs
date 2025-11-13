@@ -28,6 +28,8 @@ namespace StarterAssets
         //private Interactable focusedInteractable;
         TypesOfInteractables rayHitThisBefore = TypesOfInteractables.None;
 
+        //eq
+        int previousSelectedSlot = -1;
 
         [Header("Look Settings")]
         [Tooltip("Mouse sensitivity multiplier for raw Pointer/Delta input")]
@@ -127,6 +129,8 @@ namespace StarterAssets
 
         EventBinding<InteractEvent> interactEventBinding;
 
+        EventBinding<LiraEvent> liraEventBiding;
+
         private bool IsCurrentDeviceMouse
 		{
 			get
@@ -181,11 +185,16 @@ namespace StarterAssets
 
             interactEventBinding = new EventBinding<InteractEvent>(HandleInteractEvent);
             EventBus<InteractEvent>.Register(interactEventBinding);
+
+            liraEventBiding = new EventBinding<LiraEvent>(HandleLiraEvent);
+            EventBus<LiraEvent>.Register(liraEventBiding);
         }
 
         private void OnDisable()
         {
             EventBus<InteractEvent>.Deregister(interactEventBinding);
+
+            EventBus<LiraEvent>.Deregister(liraEventBiding);
         }
 
         private void Update()
@@ -197,6 +206,7 @@ namespace StarterAssets
             HandleCrouchToggle();
             ApplyCrouchBlend();
             HandleInteract();
+            HandleEq();
         }
 
 		private void LateUpdate()
@@ -208,6 +218,34 @@ namespace StarterAssets
 		{
 			RotationSpeed = amount;
 		}
+
+        void HandleLiraEvent()
+        {
+            EventBus<MakeSoundEvent>.Raise(new MakeSoundEvent
+            {
+                positionOfSound=transform.position
+            });
+        }
+
+        void HandleEq()
+        {
+            if(_input.selectedSlot != previousSelectedSlot)
+            {
+                previousSelectedSlot = _input.selectedSlot;
+                EventBus<VisualSelectedItemEq>.Raise(new VisualSelectedItemEq
+                {
+                    index = _input.selectedSlot
+                });
+            }
+
+            if (_input.attack)
+            {
+                EventBus<UseItemInEq>.Raise(new UseItemInEq
+                {
+                    index=_input.selectedSlot
+                });
+            }
+        }
 
         void HandleInteract()
         {

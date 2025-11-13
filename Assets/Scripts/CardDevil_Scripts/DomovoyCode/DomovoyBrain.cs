@@ -68,9 +68,9 @@ public class DomovoyBrain : MonoBehaviour
     }
 
 
-    void HandleSoundEvent()
+    void HandleSoundEvent(MakeSoundEvent e)
     {
-        domovoyLogic.SetDestination(player.transform.position);
+        domovoyLogic.SetDestination(e.positionOfSound);
     }
 
     void DrawPath()
