@@ -202,6 +202,7 @@ namespace StarterAssets
 			JumpAndGravity();
 			GroundedCheck();
 			Move();
+            SendSprintEvent();
 
             HandleCrouchToggle();
             ApplyCrouchBlend();
@@ -218,6 +219,18 @@ namespace StarterAssets
 		{
 			RotationSpeed = amount;
 		}
+
+        void SendSprintEvent()
+        {
+
+            if (_input.sprint)
+            {
+                EventBus<PlayerIsRunningEvent>.Raise(new PlayerIsRunningEvent
+                {
+                    isPlayerRunning = _input.sprint
+                });
+            }
+        }
 
         void HandleLiraEvent()
         {

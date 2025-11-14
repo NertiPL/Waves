@@ -43,3 +43,18 @@ public struct VisualSelectedItemEq : IEvent
 public struct LiraEvent :IEvent { }
 public struct FlashBombEvent :IEvent { }
 
+public struct PlayerInHearAreaEvent : IEvent
+{
+    public bool isPlayerIn;
+}
+
+public struct PlayerInChaseAreaEvent : IEvent
+{
+    public bool isPlayerIn;
+}
+
+public struct PlayerIsRunningEvent : IEvent
+{
+    public bool isPlayerRunning;
+}
+
