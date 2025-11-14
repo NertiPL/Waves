@@ -222,14 +222,10 @@ namespace StarterAssets
 
         void SendSprintEvent()
         {
-
-            if (_input.sprint)
+            EventBus<PlayerIsRunningEvent>.Raise(new PlayerIsRunningEvent
             {
-                EventBus<PlayerIsRunningEvent>.Raise(new PlayerIsRunningEvent
-                {
-                    isPlayerRunning = _input.sprint
-                });
-            }
+                isPlayerRunning = _input.sprint
+            });
         }
 
         void HandleLiraEvent()
